@@ -1,0 +1,646 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>北雪 | 电气大一，在练 C++ 和算法</title>
+<meta name="description" content="北雪的个人主页。沈阳理工大学电气专业大一，在学 C 语言、C++ 和算法，喜欢编程、游戏和音乐。" />
+<meta name="author" content="北雪" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="北雪 | 电气大一，在练 C++ 和算法" />
+<meta property="og:description" content="沈阳理工大学 · 电气专业 · 大一 ｜ 在学 C 语言 / C++ / 算法" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%231b1224'/%3E%3Cg stroke='%23ff89b5' stroke-width='4' stroke-linecap='round'%3E%3Cpath d='M32 12v40M14 22l36 20M50 22L14 42'/%3E%3C/g%3E%3C/svg%3E" />
+
+<!--
+  ============================================================
+  北雪的个人主页 · 单文件版本（无任何外部依赖，可直接放 GitHub Pages）
+  ------------------------------------------------------------
+  需要填的地方：全文搜索「占位」，一共 4 个模块。
+  改完直接覆盖 index.html，不需要任何构建步骤。
+  ============================================================
+-->
+
+<style>
+/* ===================== 主题变量 ===================== */
+:root{
+  --pink:#ff7fb6;
+  --pink-2:#ffa9d3;
+  --violet:#a77bff;
+  --sky:#7fd8ff;
+  --radius:22px;
+  --maxw:1080px;
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+html[data-theme="dark"]{
+  --bg:#150f1c;
+  --bg-2:#1e1429;
+  --nav-bg:rgba(21,15,28,.78);
+  --card:rgba(255,255,255,.045);
+  --card-hi:rgba(255,255,255,.075);
+  --brd:rgba(255,137,181,.22);
+  --text:#f5eff8;
+  --dim:#b6a6c2;
+  --shadow:0 18px 50px rgba(0,0,0,.45);
+  --glow:0 0 0 1px rgba(255,137,181,.25), 0 12px 40px rgba(255,127,182,.18);
+}
+html[data-theme="light"]{
+  --bg:#fff7fb;
+  --bg-2:#ffeef7;
+  --nav-bg:rgba(255,247,251,.82);
+  --card:rgba(255,255,255,.78);
+  --card-hi:#ffffff;
+  --brd:rgba(255,127,182,.3);
+  --text:#2d2131;
+  --dim:#705d78;
+  --shadow:0 18px 44px rgba(255,127,182,.18);
+  --glow:0 0 0 1px rgba(255,127,182,.35), 0 12px 36px rgba(255,127,182,.22);
+}
+
+/* ===================== 基础 ===================== */
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB","Noto Sans SC",system-ui,-apple-system,"Segoe UI",sans-serif;
+  line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  transition:background .4s var(--ease), color .4s var(--ease);
+}
+img,svg{max-width:100%;display:block}
+a{color:var(--pink);text-decoration:none}
+a:hover{text-decoration:underline}
+button{font:inherit;color:inherit}
+.wrap{width:min(var(--maxw),92vw);margin:0 auto}
+.dim{color:var(--dim)}
+.mono{font-family:ui-monospace,SFMono-Regular,Consolas,"Courier New",monospace}
+
+/* 背景光斑 + 飘雪 */
+.bg-fx{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:.5}
+.blob.b1{width:46vw;height:46vw;left:-12vw;top:-10vw;background:radial-gradient(circle at 30% 30%,var(--pink),transparent 68%)}
+.blob.b2{width:40vw;height:40vw;right:-10vw;top:22vh;background:radial-gradient(circle at 60% 40%,var(--violet),transparent 68%);opacity:.38}
+.blob.b3{width:38vw;height:38vw;left:20vw;bottom:-16vw;background:radial-gradient(circle at 50% 50%,var(--sky),transparent 70%);opacity:.26}
+.snow{position:absolute;top:-6vh;color:var(--pink-2);opacity:.5;font-size:14px;animation:fall linear infinite}
+@keyframes fall{
+  0%{transform:translateY(-10vh) rotate(0deg)}
+  100%{transform:translateY(112vh) rotate(320deg)}
+}
+
+/* ===================== 导航 ===================== */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:60;
+  background:var(--nav-bg);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--brd);
+}
+.nav-in{display:flex;align-items:center;gap:14px;padding:10px 0}
+.logo{display:flex;align-items:center;gap:8px;font-weight:800;letter-spacing:.5px;white-space:nowrap}
+.logo .dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,var(--pink),var(--violet));box-shadow:0 0 12px var(--pink)}
+.nav-links{display:flex;gap:2px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links a{
+  color:var(--dim);padding:7px 12px;border-radius:999px;font-size:14px;white-space:nowrap;
+  transition:.25s var(--ease);
+}
+.nav-links a:hover{color:var(--text);background:var(--card-hi);text-decoration:none}
+.nav-links a.active{color:#fff;background:linear-gradient(135deg,var(--pink),var(--violet))}
+.theme-btn{
+  flex:0 0 auto;width:38px;height:38px;border-radius:50%;cursor:pointer;
+  border:1px solid var(--brd);background:var(--card);font-size:16px;line-height:1;
+  transition:.25s var(--ease);
+}
+.theme-btn:hover{transform:rotate(-18deg) scale(1.08);border-color:var(--pink)}
+
+/* ===================== 通用标题 ===================== */
+section{padding:74px 0;scroll-margin-top:70px}
+.sec-tag{
+  display:inline-block;font-size:12px;letter-spacing:3px;color:var(--pink);
+  border:1px solid var(--brd);border-radius:999px;padding:4px 14px;margin-bottom:14px;
+  background:var(--card);
+}
+h2{font-size:clamp(24px,3.4vw,34px);margin:0 0 10px;letter-spacing:.5px}
+h2 em{font-style:normal;color:var(--pink)}
+.sec-sub{color:var(--dim);margin:0 0 30px;max-width:62ch}
+
+/* ===================== 卡片 ===================== */
+.grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.card{
+  background:var(--card);border:1px solid var(--brd);border-radius:var(--radius);
+  padding:22px;box-shadow:var(--shadow);backdrop-filter:blur(8px);
+  transition:.35s var(--ease);
+}
+.card:hover{transform:translateY(-5px);border-color:var(--pink);box-shadow:var(--glow)}
+.card h3{margin:10px 0 8px;font-size:18px}
+.card p{margin:0;color:var(--dim);font-size:15px}
+.card .ico{font-size:26px}
+.badge{
+  display:inline-block;font-size:12px;color:var(--pink);background:rgba(255,127,182,.12);
+  border:1px solid var(--brd);border-radius:999px;padding:2px 10px;margin:10px 6px 0 0;
+}
+.bar{height:8px;border-radius:99px;background:rgba(127,127,127,.22);overflow:hidden;margin-top:14px}
+.bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--pink),var(--violet))}
+
+/* ===================== 首屏 ===================== */
+.hero{padding:132px 0 60px}
+.hero-in{display:grid;grid-template-columns:1.35fr .85fr;gap:34px;align-items:center}
+.hello{color:var(--pink);font-weight:700;letter-spacing:2px;font-size:14px;margin-bottom:8px}
+h1{font-size:clamp(30px,5.2vw,50px);line-height:1.24;margin:0 0 16px;letter-spacing:1px}
+h1 .hl{
+  background:linear-gradient(120deg,var(--pink),var(--violet) 60%,var(--sky));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.lead{color:var(--dim);font-size:16px;max-width:56ch}
+.chips{margin:20px 0 26px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  font-size:13px;padding:5px 13px;border-radius:999px;
+  border:1px solid var(--brd);background:var(--card);color:var(--text);
+}
+.btn{
+  display:inline-block;padding:11px 22px;border-radius:999px;cursor:pointer;border:1px solid transparent;
+  background:linear-gradient(135deg,var(--pink),var(--violet));color:#fff;font-weight:700;font-size:15px;
+  transition:.3s var(--ease);text-decoration:none;
+}
+.btn:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(255,127,182,.4);text-decoration:none}
+.btn.ghost{background:transparent;color:var(--text);border-color:var(--brd)}
+.btn.ghost:hover{border-color:var(--pink);box-shadow:var(--glow)}
+.cta{display:flex;flex-wrap:wrap;gap:12px}
+
+.avatar-wrap{position:relative;justify-self:center;width:min(300px,74vw);aspect-ratio:1}
+.avatar-wrap::after{
+  content:"";position:absolute;inset:-14px;border-radius:50%;
+  background:conic-gradient(from 0deg,var(--pink),var(--violet),var(--sky),var(--pink));
+  filter:blur(18px);opacity:.5;z-index:0;animation:spin 14s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.avatar{
+  position:relative;z-index:1;width:100%;height:100%;border-radius:50%;
+  background:linear-gradient(160deg,var(--bg-2),var(--bg));
+  border:1px solid var(--brd);display:grid;place-items:center;box-shadow:var(--shadow);
+}
+.avatar svg{width:62%;height:62%;animation:spin 26s linear infinite}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:52px}
+.stat{background:var(--card);border:1px solid var(--brd);border-radius:16px;padding:16px 18px}
+.stat b{display:block;font-size:22px;color:var(--pink)}
+.stat span{font-size:13px;color:var(--dim)}
+
+/* ===================== 时间线 ===================== */
+.timeline{position:relative;padding-left:26px;margin-top:6px}
+.timeline::before{content:"";position:absolute;left:6px;top:6px;bottom:6px;width:2px;background:linear-gradient(var(--pink),var(--violet),transparent)}
+.tl-item{position:relative;padding:0 0 26px 12px}
+.tl-item::before{
+  content:"";position:absolute;left:-26px;top:9px;width:12px;height:12px;border-radius:50%;
+  background:var(--pink);box-shadow:0 0 0 4px rgba(255,127,182,.2);
+}
+.tl-item time{font-size:13px;color:var(--pink);font-weight:700;letter-spacing:1px}
+.tl-item h3{margin:4px 0 6px;font-size:17px}
+.tl-item p{margin:0;color:var(--dim);font-size:15px}
+
+/* ===================== 联系 ===================== */
+.contact-list{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.contact{
+  display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--brd);
+  border-radius:16px;padding:14px 18px;transition:.3s var(--ease);
+}
+.contact:hover{border-color:var(--pink);transform:translateX(4px)}
+.contact .k{font-size:13px;color:var(--dim);flex:0 0 68px}
+.contact .v{font-weight:700;word-break:break-all;font-size:15px}
+.copy{
+  margin-left:auto;flex:0 0 auto;border:1px solid var(--brd);background:transparent;color:var(--pink);
+  border-radius:999px;padding:4px 12px;font-size:12px;cursor:pointer;transition:.25s var(--ease);
+}
+.copy:hover{background:var(--pink);color:#fff;border-color:var(--pink)}
+
+/* ===================== 页脚 / 回到顶部 ===================== */
+footer{border-top:1px solid var(--brd);padding:34px 0 44px;color:var(--dim);font-size:14px;text-align:center}
+.top-btn{
+  position:fixed;right:20px;bottom:22px;z-index:59;width:44px;height:44px;border-radius:50%;
+  border:1px solid var(--brd);background:var(--nav-bg);backdrop-filter:blur(10px);cursor:pointer;
+  font-size:17px;opacity:0;pointer-events:none;transition:.35s var(--ease);
+}
+.top-btn.show{opacity:1;pointer-events:auto}
+.top-btn:hover{border-color:var(--pink);transform:translateY(-4px)}
+
+/* 滚动出现 */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+
+/* ===================== 响应式 ===================== */
+@media (max-width:820px){
+  .hero{padding:112px 0 40px}
+  .hero-in{grid-template-columns:1fr}
+  .avatar-wrap{order:-1;width:min(220px,60vw)}
+  section{padding:56px 0}
+  .nav-in{gap:8px}
+  .logo span.t{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<!-- 背景装饰：光斑 + 飘雪（纯 CSS 动画，不放任何图片） -->
+<div class="bg-fx" aria-hidden="true">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+  <div id="snowLayer"></div>
+</div>
+
+<!-- ===================== 导航 ===================== -->
+<header class="nav">
+  <div class="wrap nav-in">
+    <div class="logo"><span class="dot"></span><span class="t">北雪</span></div>
+    <nav class="nav-links" id="navLinks">
+      <a href="#stack">在敲什么</a>
+      <a href="#about">我是谁</a>
+      <a href="#campus">学校里</a>
+      <a href="#interests">兴趣</a>
+      <a href="#journey">进度</a>
+      <a href="#life">代码之外</a>
+      <a href="#contact">联系</a>
+    </nav>
+    <button class="theme-btn" id="themeBtn" title="切换主题" aria-label="切换主题">🌙</button>
+  </div>
+</header>
+
+<main>
+<!-- ===================== 首屏 ===================== -->
+<section class="hero" id="top">
+  <div class="wrap hero-in">
+    <div>
+      <p class="hello">沈阳理工大学 · 电气专业 · 大一</p>
+      <h1>我是北雪，<span class="hl">电气大一</span>，<br />在练 C 和 C++。</h1>
+      <p class="lead">
+        在沈阳读书。白天上电路课，晚上写代码刷题。
+        这个页面用来记我目前在学什么、学到哪一步，以及代码之外的那部分生活。
+      </p>
+      <div class="chips">
+        <span class="chip"># C 语言</span>
+        <span class="chip"># C++</span>
+        <span class="chip"># 算法</span>
+        <span class="chip"># 电气</span>
+        <span class="chip"># 游戏</span>
+        <span class="chip"># 音乐</span>
+      </div>
+      <div class="cta">
+        <a class="btn" href="#stack">我在学什么 →</a>
+        <a class="btn ghost" href="#contact">怎么找到我 →</a>
+      </div>
+    </div>
+
+    <div class="avatar-wrap">
+      <div class="avatar">
+        <!-- 内联 SVG 雪花，无外链；想换头像就把这段 <svg> 换成 <img src="avatar.jpg" alt="头像" /> -->
+        <svg viewBox="0 0 64 64" role="img" aria-label="雪花图形">
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#ff7fb6" />
+              <stop offset="55%" stop-color="#a77bff" />
+              <stop offset="100%" stop-color="#7fd8ff" />
+            </linearGradient>
+          </defs>
+          <g stroke="url(#g1)" stroke-width="4" stroke-linecap="round" fill="none">
+            <path d="M32 8v48M11 20l42 24M53 20L11 44" />
+            <path d="M32 18l-7-7M32 18l7-7M32 46l-7 7M32 46l7 7" stroke-width="3" />
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="stats reveal">
+      <div class="stat"><b>大一</b><span>沈阳理工大学 · 电气</span></div>
+      <div class="stat"><b>3</b><span>正在学的方向</span></div>
+      <div class="stat"><b>0</b><span>外部依赖（整站一个文件）</span></div>
+      <div class="stat"><b>1</b><span>在沈阳的人</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 在敲什么 ===================== -->
+<section id="stack">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="sec-tag">在学</span>
+      <h2>手上在<em>敲什么</em>。</h2>
+      <p class="sec-sub">只写现在真的在碰的东西。进度条是按我自己的感觉拉的，不是成绩单。</p>
+    </div>
+    <div class="grid reveal">
+      <article class="card">
+        <h3>💻 C 语言</h3>
+        <p>大一上的重点。变量、循环、数组、函数都在过，课后题基本自己写。现在写个小程序不太卡壳了。</p>
+        <div class="bar"><i style="width:72%"></i></div>
+        <span class="badge">正在学</span><span class="badge">作业与练习</span>
+      </article>
+      <article class="card">
+        <h3>➕ C++</h3>
+        <p>刚起步。先把 cin / cout、string、vector、sort 这些常用东西用顺，再回头补类和 STL 的细节。</p>
+        <div class="bar"><i style="width:46%"></i></div>
+        <span class="badge">刚起步</span><span class="badge">STL</span>
+      </article>
+      <article class="card">
+        <h3>🧩 算法</h3>
+        <p>在备赛。按专题刷：模拟、枚举、排序、二分、前缀和。做完会记一句这题当时卡在哪。</p>
+        <div class="bar"><i style="width:38%"></i></div>
+        <span class="badge">备赛中</span><span class="badge">专题刷题</span>
+      </article>
+      <article class="card">
+        <h3>⚡ 电气专业课</h3>
+        <p>电路、电工这些课同步上。先把专业基础拿稳，以后想试试把程序接到硬件上，做点看得见的东西。</p>
+        <div class="bar"><i style="width:55%"></i></div>
+        <span class="badge">专业基础</span><span class="badge">大一课程</span>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 我是谁 ===================== -->
+<section id="about">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="sec-tag">关于</span>
+      <h2>我是<em>北雪</em>。</h2>
+      <p class="sec-sub">电气专业，大一，在沈阳。下面三件事大概能说明我现在的状态。</p>
+    </div>
+    <div class="grid reveal">
+      <article class="card">
+        <div class="ico">⚡</div>
+        <h3>为什么选电气</h3>
+        <p>填志愿的时候没想太远，听说电气好就业，就选了这个专业。现在上着电路课，先把课学明白，以后具体做什么，走一步看一步。</p>
+      </article>
+      <article class="card">
+        <div class="ico">⌨️</div>
+        <h3>为什么开始写代码</h3>
+        <p>想让电脑替我做点事，就从 C 语言开始了。写着写着发现，把一个问题拆成几步、再用代码说清楚，这件事本身挺上瘾。</p>
+      </article>
+      <article class="card">
+        <div class="ico">📌</div>
+        <h3>现在的状态</h3>
+        <p>课不少，空闲时间基本分成两半：一半写代码刷题，一半打游戏。学得不算快，但每个新东西都会自己动手写一遍。</p>
+      </article>
+    </div>
+    <div class="card reveal" style="margin-top:18px">
+      <p>
+        平时最放松的时候是戴着耳机写代码，或者跟同学开黑。
+        接下来想把 <b>C++</b> 学扎实，认真准备一次 <b>算法竞赛</b>——先把基础打牢，再谈别的。
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 学校里 ===================== -->
+<section id="campus">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="sec-tag">学校</span>
+      <h2>学校里，<em>时间这样过</em>。</h2>
+      <p class="sec-sub">在沈阳理工的日常：上课、自习、刷题，还有几件还没写下来的事。</p>
+    </div>
+    <div class="grid reveal">
+      <article class="card">
+        <h3>上课</h3>
+        <p>电气专业的课排得挺满，电路是现在花时间最多的一门。课上听不太懂的地方，回宿舍再翻一遍书。</p>
+        <span class="badge">电气专业课</span><span class="badge">做笔记</span>
+      </article>
+      <article class="card">
+        <h3>自习和刷题</h3>
+        <p>习惯把每天做的题记一笔：思路、错在哪、下次怎么改。慢，但过几天回头写同一道题会明显快很多。</p>
+        <span class="badge">算法练习</span><span class="badge">错题记录</span>
+      </article>
+      <article class="card">
+        <!-- 占位：换成你实际加入的社团 / 战队 -->
+        <h3>社团和同学</h3>
+        <p>占位：这里写你加入了什么社团或战队（计算机协会、电子协会、ACM 集训队……），以及想在里面做什么。</p>
+        <span class="badge">占位：社团名称</span><span class="badge">占位：想做的事</span>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 兴趣 ===================== -->
+<section id="interests">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="sec-tag">兴趣</span>
+      <h2>会让我<em>点开</em>的东西。</h2>
+      <p class="sec-sub">主要是四样：代码、游戏、音乐，还有"它到底怎么运作的"。</p>
+    </div>
+    <div class="grid reveal">
+      <article class="card"><div class="ico">💻</div><h3>写代码</h3><p>能跑起来就是最直接的反馈。报错看不懂的时候先翻文档、再问同学，现在至少能看懂一半了。</p></article>
+      <article class="card"><div class="ico">🎮</div><h3>游戏</h3><p>会琢磨里面的数值和机制，也会想「这段逻辑换成我写，得怎么写」——虽然多半想不出来。</p></article>
+      <article class="card"><div class="ico">🎵</div><h3>音乐</h3><p>写代码和刷题的时候耳机基本不摘。常听的那几首放在下面「代码之外」里。</p></article>
+      <article class="card"><div class="ico">🔍</div><h3>弄懂原理</h3><p>比起背结论，更想知道它是怎么推出来的。想通一次基本就忘不掉，比抄十遍有用。</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 进度 ===================== -->
+<section id="journey">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="sec-tag">进度</span>
+      <h2>走到<em>哪一步</em>了。</h2>
+      <p class="sec-sub">按时间顺序排，以后再往后面接着写。</p>
+    </div>
+    <div class="timeline reveal">
+      <div class="tl-item">
+        <time>2026.09</time>
+        <h3>来沈阳上学</h3>
+        <p>成为沈阳理工大学电气专业大一学生，开始上专业课。</p>
+      </div>
+      <div class="tl-item">
+        <time>大一上</time>
+        <h3>把 C 语言过一遍</h3>
+        <p>从变量、循环、数组到函数，边学边写，课后题自己动手做。</p>
+      </div>
+      <div class="tl-item">
+        <time>进行中</time>
+        <h3>C++ 和算法专题</h3>
+        <p>学 C++ 和 STL，同时按专题刷算法题，练思路也练手速。</p>
+      </div>
+      <div class="tl-item">
+        <time>下一步</time>
+        <!-- 占位：换成你真正想做的事 -->
+        <h3>占位：接下来想去哪</h3>
+        <p>占位：这里写后面的目标，比如「打一次正式比赛」「做出一个完整的小项目」「把代码和电气专业接起来」。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 代码之外 ===================== -->
+<section id="life">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="sec-tag">课余</span>
+      <h2>代码<em>之外</em>。</h2>
+      <p class="sec-sub">游戏和音乐占了我另外半条命。</p>
+    </div>
+    <div class="grid reveal">
+      <article class="card">
+        <div class="ico">🎮</div>
+        <h3>平时在玩的</h3>
+        <!-- 占位：把下面三条换成你真正在玩的游戏 -->
+        <ul style="margin:10px 0 0;padding-left:20px;color:var(--dim)">
+          <li>占位：游戏名 ①</li>
+          <li>占位：游戏名 ②</li>
+          <li>占位：游戏名 ③</li>
+        </ul>
+        <p style="margin-top:10px">喜欢它哪一点，也可以在这里补一句。</p>
+      </article>
+      <article class="card">
+        <div class="ico">🎧</div>
+        <h3>耳机里的</h3>
+        <!-- 占位：把下面三条换成你真正在听的歌 -->
+        <ul style="margin:10px 0 0;padding-left:20px;color:var(--dim)">
+          <li>占位：《歌名》— 歌手 ①</li>
+          <li>占位：《歌名》— 歌手 ②</li>
+          <li>占位：《歌名》— 歌手 ③</li>
+        </ul>
+        <p style="margin-top:10px">写代码时循环最多的那几首，放这里最合适。</p>
+      </article>
+      <article class="card">
+        <div class="ico">🌙</div>
+        <h3>日常里的小事</h3>
+        <p>占位：熬夜调一个跑不通的程序、和室友开黑到两点、在图书馆抢到靠窗的座位……挑一件你愿意写的。哪怕一句话，也会让这页更像你。</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 联系 ===================== -->
+<section id="contact">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="sec-tag">联系</span>
+      <h2>加个<em>好友</em>？</h2>
+      <p class="sec-sub">同校的、一起刷题的、一起开黑的，都可以直接加我。</p>
+    </div>
+    <div class="contact-list reveal">
+      <div class="contact"><span class="k">QQ</span><span class="v mono" data-copy="1725502329">1725502329</span><button class="copy">复制</button></div>
+      <div class="contact"><span class="k">微信</span><span class="v mono" data-copy="b1725502329">b1725502329</span><button class="copy">复制</button></div>
+      <div class="contact"><span class="k">邮箱</span><span class="v mono" data-copy="1725502329@qq.com">1725502329@qq.com</span><button class="copy">复制</button></div>
+      <div class="contact"><span class="k">Steam</span><span class="v mono" data-copy="1058473434">好友代码 1058473434</span><button class="copy">复制</button></div>
+    </div>
+    <p class="sec-sub reveal" style="margin-top:20px">
+      要是你也在学 C / C++、也在准备算法竞赛，加我说一声，一起刷比一个人刷有意思。
+    </p>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    © <span id="year">2026</span> <b>北雪</b> ｜ 沈阳理工大学 · 电气专业 · 大一 ｜ 手写 HTML / CSS / JS，没有框架，没有外部依赖
+  </div>
+</footer>
+
+<button class="top-btn" id="topBtn" title="回到顶部" aria-label="回到顶部">↑</button>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- 1. 主题切换（记忆到 localStorage） ---------- */
+  var root = document.documentElement;
+  var themeBtn = document.getElementById("themeBtn");
+  var saved = null;
+  try { saved = localStorage.getItem("beixue-theme"); } catch (e) {}
+  if (saved === "light" || saved === "dark") root.setAttribute("data-theme", saved);
+  function syncThemeIcon() {
+    themeBtn.textContent = root.getAttribute("data-theme") === "dark" ? "🌙" : "☀️";
+  }
+  syncThemeIcon();
+  themeBtn.addEventListener("click", function () {
+    var next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("beixue-theme", next); } catch (e) {}
+    syncThemeIcon();
+  });
+
+  /* ---------- 2. 背景飘雪（随机位置 / 大小 / 速度） ---------- */
+  var snowLayer = document.getElementById("snowLayer");
+  var glyphs = ["❄", "❅", "✦", "·"];
+  for (var i = 0; i < 16; i++) {
+    var s = document.createElement("span");
+    s.className = "snow";
+    s.textContent = glyphs[i % glyphs.length];
+    s.style.left = (Math.random() * 100).toFixed(2) + "vw";
+    s.style.fontSize = (9 + Math.random() * 12).toFixed(1) + "px";
+    s.style.animationDuration = (11 + Math.random() * 14).toFixed(1) + "s";
+    s.style.animationDelay = (-Math.random() * 20).toFixed(1) + "s";
+    s.style.opacity = (0.18 + Math.random() * 0.4).toFixed(2);
+    snowLayer.appendChild(s);
+  }
+
+  /* ---------- 3. 滚动出现动画 ---------- */
+  var reveals = document.querySelectorAll(".reveal");
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, { threshold: 0.12 });
+    reveals.forEach(function (el) { io.observe(el); });
+  } else {
+    reveals.forEach(function (el) { el.classList.add("in"); });
+  }
+
+  /* ---------- 4. 导航高亮 + 回到顶部 ---------- */
+  var links = Array.prototype.slice.call(document.querySelectorAll("#navLinks a"));
+  var sections = links.map(function (a) { return document.querySelector(a.getAttribute("href")); });
+  var topBtn = document.getElementById("topBtn");
+  function onScroll() {
+    var y = window.scrollY + 120;
+    var idx = -1;
+    sections.forEach(function (sec, i) { if (sec && sec.offsetTop <= y) idx = i; });
+    links.forEach(function (a, i) { a.classList.toggle("active", i === idx); });
+    topBtn.classList.toggle("show", window.scrollY > 500);
+  }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+  topBtn.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
+
+  /* ---------- 5. 复制联系方式 ---------- */
+  function fallbackCopy(text, done) {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); done(); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+  document.querySelectorAll(".copy").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var text = btn.previousElementSibling.getAttribute("data-copy");
+      var done = function () {
+        var old = btn.textContent;
+        btn.textContent = "已复制 ✓";
+        setTimeout(function () { btn.textContent = old; }, 1400);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, function () { fallbackCopy(text, done); });
+      } else {
+        fallbackCopy(text, done);
+      }
+    });
+  });
+
+  /* ---------- 6. 页脚年份 ---------- */
+  document.getElementById("year").textContent = new Date().getFullYear();
+})();
+</script>
+</body>
+</html>
