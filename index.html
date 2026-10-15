@@ -462,6 +462,11 @@ html[data-theme="light"] .gw-card{background:linear-gradient(180deg,rgba(255,255
   .gw-ready .gw-title .ch > i{transform:none!important}
 }
 
+/* 等页面就绪：入场层整体暂停、卡片先不露出来（只有 JS 会加 .hold，所以没 JS 时照常播） */
+.gate.hold .gi, .gate.hold .gi *{animation-play-state:paused!important}
+.gate.hold .gi{background:transparent}   /* 等待期露出欢迎页自己的网格/光斑/飘雪，不黑屏 */
+.gate.hold .gw-card, .gate.hold .gw-foot{opacity:0}
+
 /* —— 入场层（参考片子的硬切 + 几何形状）—— */
 .gi{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden;background:var(--bg);
   animation:giOut .5s var(--ease) 1.95s forwards}
@@ -1416,19 +1421,38 @@ html[data-theme="light"] .fx-ripple{
     });
   })();
 
-  /* 入场动效：2 秒后把画面交给卡片（加 .gw-ready 触发起伏入场），随后移除入场层 */
+  /* 入场动效：先暂停，等页面就绪（load 事件，最多等 1.2 秒）再从头播，
+     这样手机上不会出现"还没加载完就先演一遍"的卡顿入场 */
   (function gateIntro() {
+    var gateEl = document.getElementById("gate");
     var gi = document.getElementById("gateIntro");
     var welcome = document.getElementById("gateWelcome");
     var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     function ready() { if (welcome) welcome.classList.add("gw-ready"); }
-    if (!gi || reduced) {
+    if (!gi || !gateEl || reduced) {
       if (gi && gi.parentNode) gi.parentNode.removeChild(gi);
       ready();
       return;
     }
-    setTimeout(ready, 1950);
-    setTimeout(function () { if (gi.parentNode) gi.parentNode.removeChild(gi); }, 2650);
+    gateEl.classList.add("hold");                 /* 先冻结入场动画、把卡片藏起来 */
+    var started = false;
+    function begin() {
+      if (started) return;
+      started = true;
+      gateEl.classList.remove("hold");            /* 解除冻结 → 入场从头完整播一遍 */
+      setTimeout(ready, 1950);
+      setTimeout(function () { if (gi.parentNode) gi.parentNode.removeChild(gi); }, 2650);
+    }
+    function afterPaint() {                       /* 等两帧，确保页面已经真正画出来 */
+      requestAnimationFrame(function () { requestAnimationFrame(begin); });
+    }
+    if (document.readyState === "complete") {
+      afterPaint();
+    } else {
+      var once = function () { if (!started) afterPaint(); };
+      window.addEventListener("load", once);
+      setTimeout(once, 1200);                     /* 兜底：慢网也不至于一直黑着 */
+    }
   })();
 
   function gateFinish() {
