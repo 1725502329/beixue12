@@ -85,7 +85,9 @@ button{font:inherit;color:inherit}
 
 /* 背景光斑 + 飘雪 */
 .bg-fx{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
-.blob{position:absolute;border-radius:50%;filter:blur(48px);opacity:.5}   /* 70→48px：降低光栅化成本 */
+.blob{position:absolute;border-radius:50%;opacity:.5;
+  -webkit-mask-image:radial-gradient(circle,#000 34%,transparent 72%);
+  mask-image:radial-gradient(circle,#000 34%,transparent 72%)}   /* 用径向遮罩代替模糊：视觉几乎一样，几乎零成本 */
 .blob.b1{width:46vw;height:46vw;left:-12vw;top:-10vw;background:radial-gradient(circle at 30% 30%,var(--pink),transparent 68%)}
 .blob.b2{width:40vw;height:40vw;right:-10vw;top:22vh;background:radial-gradient(circle at 60% 40%,var(--violet),transparent 68%);opacity:.38}
 .blob.b3{width:38vw;height:38vw;left:20vw;bottom:-16vw;background:radial-gradient(circle at 50% 50%,var(--sky),transparent 70%);opacity:.26}
@@ -635,7 +637,7 @@ html[data-theme="light"] .fx-ripple{
   .gw-card,.gl-card{background:linear-gradient(180deg,rgba(34,25,47,.95),rgba(23,16,33,.92))}
   html[data-theme="light"] .gw-card,html[data-theme="light"] .gl-card{
     background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(252,246,255,.93))}
-  .blob{filter:blur(30px)}
+  .blob{opacity:.45}
   .gate-fx .gblob{opacity:.42}
 }
 
@@ -1461,13 +1463,9 @@ html.tab-hidden .snow{animation-play-state:paused}   /* 切到后台时停掉飘
     function afterPaint() {                       /* 等两帧，确保页面已经真正画出来 */
       requestAnimationFrame(function () { requestAnimationFrame(begin); });
     }
-    if (document.readyState === "complete") {
-      afterPaint();
-    } else {
-      var once = function () { if (!started) afterPaint(); };
-      window.addEventListener("load", once);
-      setTimeout(once, 1200);                     /* 兜底：慢网也不至于一直黑着 */
-    }
+    /* 不再等 window.load：那要等 4 个 mp3 拉完，手机上会白等好几秒。
+       改成等两帧（确保画过一次）+ 180ms（让首屏图跟上），入场就从第 0 帧开始播。 */
+    setTimeout(afterPaint, 180);
   })();
 
   function gateFinish() {
